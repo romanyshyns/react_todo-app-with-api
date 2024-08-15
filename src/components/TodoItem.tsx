@@ -25,13 +25,14 @@ export const TodoItem: React.FC<Props> = ({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
     const trimmedTitle = selectTitle.trim();
 
     if (trimmedTitle === '') {
       onDelete(id);
     } else {
-      updateTodo(id, trimmedTitle);
+      updateTodo(id, trimmedTitle)?.then(() => {
+        setSelectTitle(trimmedTitle);
+      });
     }
 
     setChangeTitle(false);
