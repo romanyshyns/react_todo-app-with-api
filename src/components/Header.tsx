@@ -1,71 +1,96 @@
-import React, { useEffect, useRef } from 'react';
 import cn from 'classnames';
+
 import { Todo } from '../types/Todo';
-import { changeTodo } from '../api/todos';
+import React, { useEffect, useRef, useState } from 'react';
+import { USER_ID } from '../api/todos';
 
 type Props = {
   todos: Todo[];
-  newTodoTitle: string;
-  handleChangeNewTitle: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleEmptyLineError: (event: React.FormEvent) => void;
-  errorMessage: string;
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>;
-  tempTodo: Todo | null;
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-  setLoadingIds: React.Dispatch<React.SetStateAction<number[]>>;
-  loadingIds: number[];
+  onErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+  onSubmit: ({ userId, title, completed }: Omit<Todo, 'id'>) => Promise<void>;
+  setTempTodo: React.Dispatch<React.SetStateAction<Todo | null>>;
+  todosInProcess: number[];
+  updateTodo: (
+    todoId: number,
+    newTitle: string,
+    completed?: boolean,
+  ) => Promise<void> | undefined;
 };
 
 export const Header: React.FC<Props> = ({
   todos,
-  newTodoTitle,
-  handleChangeNewTitle,
-  handleEmptyLineError,
-  errorMessage,
-  setErrorMessage,
-  tempTodo,
-  setTodos,
-  setLoadingIds,
-  loadingIds,
+  onErrorMessage,
+  onSubmit,
+  setTempTodo,
+  todosInProcess,
+  updateTodo,
 }) => {
-  const allChecked = todos.every(todo => todo.completed);
-  const newTodoRef = useRef<HTMLInputElement>(null);
+  const [newTodoTitle, setNewTodoTitle] = useState('');
+  const [isSubmiting, setIsSubmiting] = useState(false);
+
+  const titleFiled = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    newTodoRef.current?.focus();
-  }, [todos, errorMessage]);
+    if (titleFiled.current) {
+      titleFiled.current.focus();
+    }
+  });
 
-  const toggleAll = () => {
-    const allCompleted = todos.every(todo => todo.completed);
-    const updatedTodos = todos.map(todo => ({
-      ...todo,
-      completed: !allCompleted,
-    }));
+  const allChecked = todos.every(todo => todo.completed);
 
-    const todosToUpdate = updatedTodos.filter(
-      todo => todo.completed !== allCompleted,
-    );
+  const handleNewTodoTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewTodoTitle(event.target.value);
+  };
 
-    const ids = todosToUpdate.map(todo => todo.id);
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
 
-    setLoadingIds(currentIds => [...currentIds, ...ids]);
+    const trimmedTitle = newTodoTitle.trim();
 
-    Promise.all(todosToUpdate.map(todo => changeTodo(todo, todo.id)))
+    if (!trimmedTitle) {
+      onErrorMessage('Title should not be empty');
+      setTimeout(() => onErrorMessage(''), 3000);
+
+      return;
+    }
+
+    setIsSubmiting(true);
+
+    setTempTodo({
+      id: 0,
+      title: trimmedTitle,
+      completed: false,
+      userId: USER_ID,
+    });
+
+    onSubmit({
+      userId: USER_ID,
+      title: trimmedTitle,
+      completed: false,
+    })
       .then(() => {
-        setTodos(updatedTodos);
-        setLoadingIds(currentIds => currentIds.filter(id => !ids.includes(id)));
+        setNewTodoTitle('');
       })
-      .catch(() => {
-        setErrorMessage('Unable to add a todo');
-        setTimeout(() => {
-          setErrorMessage('');
-        }, 3000);
-
-        setLoadingIds(currentIds => currentIds.filter(id => !ids.includes(id)));
+      .finally(() => {
+        setIsSubmiting(false);
       });
   };
 
-  const shouldShowToggleAllButton = todos.length > 0 && loadingIds.length === 0;
+  const handleToggleAll = () => {
+    const allCompleted = todos.every(todo => todo.completed);
+    const newCompletedStatus = !allCompleted;
+
+    const todosToUpdate = todos.filter(
+      todo => todo.completed !== newCompletedStatus,
+    );
+
+    todosToUpdate.forEach(todo => {
+      updateTodo(todo.id, todo.title, newCompletedStatus);
+    });
+  };
+
+  const shouldShowToggleAllButton =
+    todos.length > 0 && todosInProcess.length === 0;
 
   return (
     <header className="todoapp__header">
@@ -74,20 +99,20 @@ export const Header: React.FC<Props> = ({
           type="button"
           className={cn('todoapp__toggle-all', { active: allChecked })}
           data-cy="ToggleAllButton"
-          onClick={toggleAll}
+          onClick={handleToggleAll}
         />
       )}
 
-      <form onSubmit={handleEmptyLineError}>
+      <form onSubmit={handleSubmit}>
         <input
           data-cy="NewTodoField"
           type="text"
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
+          ref={titleFiled}
+          disabled={isSubmiting}
           value={newTodoTitle}
-          onChange={handleChangeNewTitle}
-          disabled={!!tempTodo}
-          ref={newTodoRef}
+          onChange={handleNewTodoTitle}
         />
       </form>
     </header>

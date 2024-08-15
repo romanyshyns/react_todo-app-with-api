@@ -1,59 +1,66 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useState } from 'react';
 import cn from 'classnames';
 import { Todo } from '../types/Todo';
+import { useState } from 'react';
 
 type Props = {
   todo: Todo;
-  deleteTodo: (userId: number) => void;
-  todosAreLoadingIds: number[];
-  updateTodo: (todoId: number, newTitle: string) => void;
-  toggleTodoCompleted: (todoId: number) => void;
+  onDelete: (postId: number) => Promise<unknown>;
+  todosInProcess: number[];
+  updateTodo: (
+    todoId: number,
+    newTitle: string,
+    completed?: boolean,
+  ) => Promise<void> | undefined;
 };
 
 export const TodoItem: React.FC<Props> = ({
-  todo,
-  deleteTodo,
-  todosAreLoadingIds,
+  todo: { completed, title, id },
+  onDelete,
+  todosInProcess,
   updateTodo,
-  toggleTodoCompleted,
 }) => {
-  const [selectTitle, setSelectTitle] = useState(todo.title);
+  const [selectTitle, setSelectTitle] = useState(title);
   const [changeTitle, setChangeTitle] = useState(false);
-
-  const handleDelete = () => {
-    if (todo.id !== undefined) {
-      deleteTodo(todo.id);
-    }
-  };
-
-  const handleKeyUp = (event: React.KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      setSelectTitle(todo.title);
-      setChangeTitle(false);
-    }
-  };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (selectTitle.trim()) {
-      updateTodo(todo.id, selectTitle.trim());
-      setChangeTitle(false);
+    const trimmedTitle = selectTitle.trim();
+
+    if (trimmedTitle === '') {
+      onDelete(id);
     } else {
-      deleteTodo(todo.id);
+      updateTodo(id, trimmedTitle);
+    }
+
+    setChangeTitle(false);
+  };
+
+  const handleChangeChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
+    updateTodo(id, selectTitle, event.target.checked);
+  };
+
+  const handleDelete = () => {
+    onDelete(id);
+  };
+
+  const handleKeyUp = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      setSelectTitle(title);
+      setChangeTitle(false);
     }
   };
 
   return (
-    <div data-cy="Todo" className={cn('todo', { completed: todo.completed })}>
+    <div data-cy="Todo" className={cn('todo', { completed })}>
       <label className="todo__status-label">
         <input
           data-cy="TodoStatus"
           type="checkbox"
           className="todo__status"
-          checked={todo.completed}
-          onChange={() => toggleTodoCompleted(todo.id)}
+          checked={completed}
+          onChange={handleChangeChecked}
         />
       </label>
 
@@ -88,17 +95,17 @@ export const TodoItem: React.FC<Props> = ({
           >
             ×
           </button>
+          <div
+            data-cy="TodoLoader"
+            className={cn('modal overlay', {
+              'is-active': todosInProcess.includes(id),
+            })}
+          >
+            <div className="modal-background has-background-white-ter" />
+            <div className="loader" />
+          </div>
         </>
       )}
-      <div
-        data-cy="TodoLoader"
-        className={cn('modal overlay', {
-          'is-active': todosAreLoadingIds.includes(todo.id),
-        })}
-      >
-        <div className="modal-background has-background-white-ter" />
-        <div className="loader" />
-      </div>
     </div>
   );
 };

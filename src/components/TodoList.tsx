@@ -5,19 +5,21 @@ import { TodoItem } from './TodoItem';
 type Props = {
   todos: Todo[];
   tempTodo: Todo | null;
-  deleteTodo: (userId: number) => void;
-  todosAreLoadingIds: number[];
-  updateTodo: (todoId: number, newTitle: string) => void;
-  toggleTodoCompleted: (todoId: number) => void;
+  onDelete: (postId: number) => Promise<unknown>;
+  todosInProcess: number[];
+  updateTodo: (
+    todoId: number,
+    newTitle: string,
+    completed?: boolean,
+  ) => Promise<void> | undefined;
 };
 
 export const TodoList: React.FC<Props> = ({
   todos,
-  deleteTodo,
   tempTodo,
-  todosAreLoadingIds,
+  onDelete,
+  todosInProcess,
   updateTodo,
-  toggleTodoCompleted,
 }) => {
   return (
     <section className="todoapp__main" data-cy="TodoList">
@@ -25,13 +27,12 @@ export const TodoList: React.FC<Props> = ({
         <TodoItem
           todo={todo}
           key={todo.id}
-          deleteTodo={deleteTodo}
-          todosAreLoadingIds={todosAreLoadingIds}
+          onDelete={onDelete}
+          todosInProcess={todosInProcess}
           updateTodo={updateTodo}
-          toggleTodoCompleted={toggleTodoCompleted}
         />
       ))}
-      {tempTodo && <TempTodo tempTitle={tempTodo.title} />}
+      {tempTodo && <TempTodo tempTitle={tempTodo} />}
     </section>
   );
 };

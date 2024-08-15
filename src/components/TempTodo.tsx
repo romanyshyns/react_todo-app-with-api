@@ -1,9 +1,11 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import { Todo } from '../types/Todo';
+
 type Props = {
-  tempTitle: string;
+  tempTitle: Todo;
 };
 
-export const TempTodo: React.FC<Props> = ({ tempTitle }) => {
+export const TempTodo: React.FC<Props> = ({ tempTitle: { title } }) => {
   return (
     <div data-cy="Todo" className="todo">
       <label className="todo__status-label">
@@ -16,7 +18,7 @@ export const TempTodo: React.FC<Props> = ({ tempTitle }) => {
       </label>
 
       <span data-cy="TodoTitle" className="todo__title">
-        {tempTitle}
+        {title}
       </span>
       <button
         type="button"
