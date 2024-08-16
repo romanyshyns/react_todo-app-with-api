@@ -12,6 +12,7 @@ type Props = {
     completed?: boolean,
   ) => Promise<void> | undefined;
 };
+
 export const TodoItem: React.FC<Props> = ({
   todo: { completed, title, id },
   onDelete,
