@@ -26,7 +26,6 @@ export const App: React.FC = () => {
         setTimeout(() => setErrorMessage(''), 3000);
       });
   }, []);
-
   const addTodo = ({ userId, title, completed }: Omit<Todo, 'id'>) => {
     setErrorMessage('');
 
@@ -75,7 +74,6 @@ export const App: React.FC = () => {
     }
 
     const trimmedTitle = newTitle.trim();
-
     const updatedTodo = {
       ...todoToUpdate,
       title: trimmedTitle,
@@ -122,7 +120,6 @@ export const App: React.FC = () => {
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
-
       <div className="todoapp__content">
         <Header
           todos={todos}
@@ -131,6 +128,7 @@ export const App: React.FC = () => {
           setTempTodo={setTempTodo}
           todosInProcess={todosInProcess}
           updateTodo={updateTodo}
+          errorMessage={errorMessage}
         />
         <TodoList
           todos={filteredTodos}
@@ -148,7 +146,6 @@ export const App: React.FC = () => {
           />
         )}
       </div>
-
       <ErrorNotification
         errorMessage={errorMessage}
         setErrorMessage={setErrorMessage}

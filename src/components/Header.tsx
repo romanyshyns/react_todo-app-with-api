@@ -1,5 +1,4 @@
 import cn from 'classnames';
-
 import { Todo } from '../types/Todo';
 import React, { useEffect, useRef, useState } from 'react';
 import { USER_ID } from '../api/todos';
@@ -15,6 +14,7 @@ type Props = {
     newTitle: string,
     completed?: boolean,
   ) => Promise<void> | undefined;
+  errorMessage: string;
 };
 
 export const Header: React.FC<Props> = ({
@@ -24,27 +24,25 @@ export const Header: React.FC<Props> = ({
   setTempTodo,
   todosInProcess,
   updateTodo,
+  errorMessage,
 }) => {
   const [newTodoTitle, setNewTodoTitle] = useState('');
   const [isSubmiting, setIsSubmiting] = useState(false);
-
   const titleFiled = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (titleFiled.current) {
       titleFiled.current.focus();
     }
-  });
+  }, [todos, errorMessage]);
 
   const allChecked = todos.every(todo => todo.completed);
-
   const handleNewTodoTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewTodoTitle(event.target.value);
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
     const trimmedTitle = newTodoTitle.trim();
 
     if (!trimmedTitle) {
@@ -55,14 +53,12 @@ export const Header: React.FC<Props> = ({
     }
 
     setIsSubmiting(true);
-
     setTempTodo({
       id: 0,
       title: trimmedTitle,
       completed: false,
       userId: USER_ID,
     });
-
     onSubmit({
       userId: USER_ID,
       title: trimmedTitle,
@@ -79,7 +75,6 @@ export const Header: React.FC<Props> = ({
   const handleToggleAll = () => {
     const allCompleted = todos.every(todo => todo.completed);
     const newCompletedStatus = !allCompleted;
-
     const todosToUpdate = todos.filter(
       todo => todo.completed !== newCompletedStatus,
     );
@@ -102,7 +97,6 @@ export const Header: React.FC<Props> = ({
           onClick={handleToggleAll}
         />
       )}
-
       <form onSubmit={handleSubmit}>
         <input
           data-cy="NewTodoField"

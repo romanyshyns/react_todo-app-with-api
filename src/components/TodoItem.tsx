@@ -2,7 +2,6 @@
 import cn from 'classnames';
 import { Todo } from '../types/Todo';
 import { useState } from 'react';
-
 type Props = {
   todo: Todo;
   onDelete: (postId: number) => Promise<unknown>;
@@ -13,7 +12,6 @@ type Props = {
     completed?: boolean,
   ) => Promise<void> | undefined;
 };
-
 export const TodoItem: React.FC<Props> = ({
   todo: { completed, title, id },
   onDelete,
@@ -22,7 +20,6 @@ export const TodoItem: React.FC<Props> = ({
 }) => {
   const [selectTitle, setSelectTitle] = useState(title);
   const [changeTitle, setChangeTitle] = useState(false);
-
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     const trimmedTitle = selectTitle.trim();
@@ -67,7 +64,6 @@ export const TodoItem: React.FC<Props> = ({
           onChange={handleChangeChecked}
         />
       </label>
-
       {changeTitle ? (
         <form onSubmit={handleSubmit}>
           <input
@@ -99,17 +95,17 @@ export const TodoItem: React.FC<Props> = ({
           >
             ×
           </button>
-          <div
-            data-cy="TodoLoader"
-            className={cn('modal overlay', {
-              'is-active': todosInProcess.includes(id),
-            })}
-          >
-            <div className="modal-background has-background-white-ter" />
-            <div className="loader" />
-          </div>
         </>
       )}
+      <div
+        data-cy="TodoLoader"
+        className={cn('modal overlay', {
+          'is-active': todosInProcess.includes(id),
+        })}
+      >
+        <div className="modal-background has-background-white-ter" />
+        <div className="loader" />
+      </div>
     </div>
   );
 };
