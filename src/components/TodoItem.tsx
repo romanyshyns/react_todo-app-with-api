@@ -30,12 +30,15 @@ export const TodoItem: React.FC<Props> = ({
     if (trimmedTitle === '') {
       onDelete(id);
     } else {
-      updateTodo(id, trimmedTitle)?.then(() => {
-        setSelectTitle(trimmedTitle);
-      });
+      setChangeTitle(false);
+      updateTodo(id, trimmedTitle)
+        ?.then(() => {
+          setSelectTitle(trimmedTitle);
+        })
+        .catch(() => {
+          setChangeTitle(true);
+        });
     }
-
-    setChangeTitle(false);
   };
 
   const handleChangeChecked = (event: React.ChangeEvent<HTMLInputElement>) => {
