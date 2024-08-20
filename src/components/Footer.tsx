@@ -2,6 +2,7 @@ import React from 'react';
 import { Todo } from '../types/Todo';
 import cn from 'classnames';
 import { Filter } from '../types/Filter';
+import { getActiveTodosCount } from '../utils/helper';
 
 type Props = {
   todos: Todo[];
@@ -27,7 +28,7 @@ export const Footer: React.FC<Props> = ({
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
-        {todos.filter(todo => !todo.completed).length} items left
+        {getActiveTodosCount(todos)} items left
       </span>
 
       <nav className="filter" data-cy="Filter">

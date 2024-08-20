@@ -30,7 +30,6 @@ export const Header: React.FC<Props> = ({
   newTodoTitle,
   setNewTodoTitle,
 }) => {
-  // const [newTodoTitle, setNewTodoTitle] = useState('');
   const [isSubmiting, setIsSubmiting] = useState(false);
   const titleFiled = useRef<HTMLInputElement>(null);
 
@@ -68,13 +67,9 @@ export const Header: React.FC<Props> = ({
       userId: USER_ID,
       title: trimmedTitle,
       completed: false,
-    })
-      // .then(() => {
-      //   setNewTodoTitle('');
-      // })
-      .finally(() => {
-        setIsSubmiting(false);
-      });
+    }).finally(() => {
+      setIsSubmiting(false);
+    });
   };
 
   const handleToggleAll = () => {
@@ -89,8 +84,7 @@ export const Header: React.FC<Props> = ({
     });
   };
 
-  const shouldShowToggleAllButton =
-    todos.length > 0 && todosInProcess.length === 0;
+  const shouldShowToggleAllButton = !!todos.length && !todosInProcess.length;
 
   return (
     <header className="todoapp__header">
