@@ -16,6 +16,7 @@ export const App: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [todosInProcess, setTodosInProcess] = useState<number[]>([]);
+  const [newTodoTitle, setNewTodoTitle] = useState('');
 
   useEffect(() => {
     todoService
@@ -26,6 +27,7 @@ export const App: React.FC = () => {
         setTimeout(() => setErrorMessage(''), 3000);
       });
   }, []);
+
   const addTodo = ({ userId, title, completed }: Omit<Todo, 'id'>) => {
     setErrorMessage('');
 
@@ -33,11 +35,11 @@ export const App: React.FC = () => {
       .postTodos({ userId, title, completed })
       .then(newTitle => {
         setTodos(currentTodo => [...currentTodo, newTitle]);
+        setNewTodoTitle('');
       })
-      .catch(error => {
+      .catch(() => {
         setErrorMessage('Unable to add a todo');
         setTimeout(() => setErrorMessage(''), 3000);
-        throw error;
       })
       .finally(() => {
         setTempTodo(null);
@@ -52,10 +54,9 @@ export const App: React.FC = () => {
       .then(() => {
         setTodos(currentTodo => currentTodo.filter(todo => todo.id !== postId));
       })
-      .catch(error => {
+      .catch(() => {
         setErrorMessage('Unable to delete a todo');
         setTimeout(() => setErrorMessage(''), 3000);
-        throw error;
       })
       .finally(() => {
         setTodosInProcess(currentId => currentId.filter(id => id !== postId));
@@ -89,10 +90,9 @@ export const App: React.FC = () => {
           currentTodos.map(todo => (todo.id === todoId ? updatedTodo : todo)),
         );
       })
-      .catch(error => {
+      .catch(() => {
         setErrorMessage('Unable to update a todo');
         setTimeout(() => setErrorMessage(''), 3000);
-        throw error;
       })
       .finally(() => {
         setTodosInProcess(currentId => currentId.filter(id => id !== todoId));
@@ -129,6 +129,8 @@ export const App: React.FC = () => {
           todosInProcess={todosInProcess}
           updateTodo={updateTodo}
           errorMessage={errorMessage}
+          newTodoTitle={newTodoTitle}
+          setNewTodoTitle={setNewTodoTitle}
         />
         <TodoList
           todos={filteredTodos}

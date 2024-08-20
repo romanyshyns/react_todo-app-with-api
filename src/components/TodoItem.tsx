@@ -12,7 +12,6 @@ type Props = {
     completed?: boolean,
   ) => Promise<void> | undefined;
 };
-
 export const TodoItem: React.FC<Props> = ({
   todo: { completed, title, id },
   onDelete,
@@ -28,10 +27,10 @@ export const TodoItem: React.FC<Props> = ({
     if (trimmedTitle === '') {
       onDelete(id);
     } else {
-      setChangeTitle(false);
       updateTodo(id, trimmedTitle)
         ?.then(() => {
           setSelectTitle(trimmedTitle);
+          setChangeTitle(false);
         })
         .catch(() => {
           setChangeTitle(true);

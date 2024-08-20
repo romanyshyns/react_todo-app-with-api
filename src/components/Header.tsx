@@ -15,6 +15,8 @@ type Props = {
     completed?: boolean,
   ) => Promise<void> | undefined;
   errorMessage: string;
+  newTodoTitle: string;
+  setNewTodoTitle: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export const Header: React.FC<Props> = ({
@@ -25,8 +27,10 @@ export const Header: React.FC<Props> = ({
   todosInProcess,
   updateTodo,
   errorMessage,
+  newTodoTitle,
+  setNewTodoTitle,
 }) => {
-  const [newTodoTitle, setNewTodoTitle] = useState('');
+  // const [newTodoTitle, setNewTodoTitle] = useState('');
   const [isSubmiting, setIsSubmiting] = useState(false);
   const titleFiled = useRef<HTMLInputElement>(null);
 
@@ -59,14 +63,15 @@ export const Header: React.FC<Props> = ({
       completed: false,
       userId: USER_ID,
     });
+
     onSubmit({
       userId: USER_ID,
       title: trimmedTitle,
       completed: false,
     })
-      .then(() => {
-        setNewTodoTitle('');
-      })
+      // .then(() => {
+      //   setNewTodoTitle('');
+      // })
       .finally(() => {
         setIsSubmiting(false);
       });
