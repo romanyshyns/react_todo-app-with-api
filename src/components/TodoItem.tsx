@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import cn from 'classnames';
 import { Todo } from '../types/Todo';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 type Props = {
   todo: Todo;
   onDelete: (postId: number) => Promise<unknown>;
@@ -20,6 +20,12 @@ export const TodoItem: React.FC<Props> = ({
 }) => {
   const [selectTitle, setSelectTitle] = useState(title);
   const [changeTitle, setChangeTitle] = useState(false);
+
+  useEffect(() => {
+    setSelectTitle(title);
+    setChangeTitle(false);
+  }, [title]);
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     const trimmedTitle = selectTitle.trim();
@@ -27,14 +33,9 @@ export const TodoItem: React.FC<Props> = ({
     if (trimmedTitle === '') {
       onDelete(id);
     } else {
-      updateTodo(id, trimmedTitle)
-        ?.then(() => {
-          setSelectTitle(trimmedTitle);
-          setChangeTitle(false);
-        })
-        .catch(() => {
-          setChangeTitle(true);
-        });
+      updateTodo(id, trimmedTitle)?.then(() => {
+        setSelectTitle(trimmedTitle);
+      });
     }
   };
 
