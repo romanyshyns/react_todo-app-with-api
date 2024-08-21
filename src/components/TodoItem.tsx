@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import cn from 'classnames';
 import { Todo } from '../types/Todo';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+
 type Props = {
   todo: Todo;
   onDelete: (postId: number) => Promise<unknown>;
@@ -12,6 +13,7 @@ type Props = {
     completed?: boolean,
   ) => Promise<void> | undefined;
 };
+
 export const TodoItem: React.FC<Props> = ({
   todo: { completed, title, id },
   onDelete,
@@ -20,15 +22,28 @@ export const TodoItem: React.FC<Props> = ({
 }) => {
   const [selectTitle, setSelectTitle] = useState(title);
   const [changeTitle, setChangeTitle] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setSelectTitle(title);
     setChangeTitle(false);
   }, [title]);
 
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current?.focus();
+    }
+  }, [changeTitle]);
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     const trimmedTitle = selectTitle.trim();
+
+    if (trimmedTitle === title) {
+      setChangeTitle(false);
+
+      return;
+    }
 
     if (trimmedTitle === '') {
       onDelete(id);
@@ -69,11 +84,11 @@ export const TodoItem: React.FC<Props> = ({
         <form onSubmit={handleSubmit}>
           <input
             data-cy="TodoTitleField"
+            ref={inputRef}
             type="text"
             className="todo__title-field"
             placeholder="Empty todo will be deleted"
             value={selectTitle}
-            autoFocus
             onBlur={handleSubmit}
             onKeyUp={handleKeyUp}
             onChange={event => setSelectTitle(event.target.value)}

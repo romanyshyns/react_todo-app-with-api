@@ -128,7 +128,6 @@ export const App: React.FC = () => {
           setTempTodo={setTempTodo}
           todosInProcess={todosInProcess}
           updateTodo={updateTodo}
-          errorMessage={errorMessage}
           newTodoTitle={newTodoTitle}
           setNewTodoTitle={setNewTodoTitle}
         />

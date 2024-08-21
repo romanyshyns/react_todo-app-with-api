@@ -14,7 +14,6 @@ type Props = {
     newTitle: string,
     completed?: boolean,
   ) => Promise<void> | undefined;
-  errorMessage: string;
   newTodoTitle: string;
   setNewTodoTitle: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -26,20 +25,20 @@ export const Header: React.FC<Props> = ({
   setTempTodo,
   todosInProcess,
   updateTodo,
-  errorMessage,
   newTodoTitle,
   setNewTodoTitle,
 }) => {
-  const [isSubmiting, setIsSubmiting] = useState(false);
-  const titleFiled = useRef<HTMLInputElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const titleField = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (titleFiled.current) {
-      titleFiled.current.focus();
+    if (titleField.current) {
+      titleField.current.focus();
     }
-  }, [todos, errorMessage]);
+  }, [todos, isSubmitting]);
 
   const allChecked = todos.every(todo => todo.completed);
+
   const handleNewTodoTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNewTodoTitle(event.target.value);
   };
@@ -55,7 +54,7 @@ export const Header: React.FC<Props> = ({
       return;
     }
 
-    setIsSubmiting(true);
+    setIsSubmitting(true);
     setTempTodo({
       id: 0,
       title: trimmedTitle,
@@ -68,7 +67,7 @@ export const Header: React.FC<Props> = ({
       title: trimmedTitle,
       completed: false,
     }).finally(() => {
-      setIsSubmiting(false);
+      setIsSubmitting(false);
     });
   };
 
@@ -102,8 +101,8 @@ export const Header: React.FC<Props> = ({
           type="text"
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
-          ref={titleFiled}
-          disabled={isSubmiting}
+          ref={titleField}
+          disabled={isSubmitting}
           value={newTodoTitle}
           onChange={handleNewTodoTitle}
         />
